@@ -695,6 +695,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 ${process.env.NODE_ENV === 'production' ? 'Production' : 'Development'} API Server running on port ${PORT}`);
-});
+// For local development only: listen on port if not running as a Vercel function
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 ${process.env.NODE_ENV === 'production' ? 'Production' : 'Development'} API Server running on port ${PORT}`);
+  });
+}
+
+// Export for Vercel Serverless Functions
+export default app;
