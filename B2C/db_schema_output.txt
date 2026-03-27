@@ -1,0 +1,47 @@
+Tables found: products, active_pools, order_history, users
+
+--- Table: products ---
+CREATE TABLE products (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  brand TEXT,
+  description TEXT,
+  progress INTEGER DEFAULT 0,
+  discount TEXT,
+  price INTEGER,
+  msrp INTEGER,
+  timeLeft TEXT,
+  image TEXT,
+  category TEXT
+, supplier_id TEXT, min_qty_to_ship INTEGER DEFAULT 1, status TEXT DEFAULT 'Pending Audit')
+
+--- Table: active_pools ---
+CREATE TABLE active_pools (
+  id TEXT PRIMARY KEY,
+  name TEXT,
+  saved TEXT,
+  progress INTEGER,
+  current TEXT,
+  msrp TEXT,
+  batch TEXT,
+  units INTEGER
+)
+
+--- Table: order_history ---
+CREATE TABLE order_history (
+  id TEXT PRIMARY KEY,
+  name TEXT,
+  date TEXT,
+  units INTEGER,
+  savings TEXT,
+  status TEXT
+)
+
+--- Table: users ---
+CREATE TABLE users (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  role TEXT DEFAULT 'Verified Collector'
+, is_verified INTEGER DEFAULT 0, verification_code TEXT)

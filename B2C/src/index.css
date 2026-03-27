@@ -1,0 +1,194 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  /* macOS Color Palette */
+  --system-blue: #007aff;
+  --system-red: #ff3b30;
+  --system-green: #34c759;
+  --system-gray: #8e8e93;
+  --system-bg-light: rgba(245, 245, 247, 0.8);
+  --system-bg-dark: rgba(28, 28, 30, 0.8);
+  
+  --primary-blue: #1d1d1f; /* Apple Black */
+  --accent-blue: #007aff;  /* Apple Blue */
+  --accent-blue-light: #e8f2ff;
+  --success-green: #34c759;
+  --bg-gray: #f5f5f7;
+  --text-main: #1d1d1f;
+  --text-muted: #86868b;
+  --white: #ffffff;
+  --border-light: rgba(0, 0, 0, 0.1);
+  --border-glass: rgba(255, 255, 255, 0.3);
+  
+  /* macOS Shadow System */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+  --shadow-premium: 0 20px 40px rgba(0,0,0,0.1);
+  
+  /* Border Radii */
+  --radius-lg: 18px;    /* Typical macOS window/card radius */
+  --radius-md: 12px;    /* Button/Input radius */
+  --radius-sm: 8px;
+  --radius-pill: 9999px;
+  
+  --container-max-width: 1200px;
+  
+  /* Smooth Motion */
+  --transition-smooth: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  background-color: var(--bg-gray);
+  color: var(--text-main);
+  line-height: 1.47059; /* Standard Apple Line Height */
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 600;
+  color: var(--primary-blue);
+  letter-spacing: -0.022em;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Premium Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid var(--border-glass);
+}
+
+.glass-dark {
+  background: rgba(28, 28, 30, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-spring);
+  border: none;
+  text-decoration: none;
+  gap: 6px;
+  outline: none;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #007aff 0%, #0063d1 100%);
+  color: var(--white);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
+  opacity: 0.9;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-secondary {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--accent-blue);
+}
+
+.btn-secondary:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.btn-outline:hover {
+  background-color: var(--accent-blue-light);
+}
+
+/* macOS Style Cards */
+.card {
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  transition: var(--transition-smooth);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* Transitions & Animations */
+.fade-in {
+  animation: appleFadeIn 0.8s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+}
+
+@keyframes appleFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Micro-animations */
+.hover-lift {
+  transition: var(--transition-spring);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* Scroll Smoothing */
+::selection {
+  background-color: rgba(0, 122, 255, 0.2);
+  color: var(--accent-blue);
+}
+
+/* Layout Utilities */
+.grid-main {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+}
+
