@@ -127,7 +127,7 @@ app.post('/api/auth/register', async (req, res) => {
     res.json({ success: true, message: 'User registered.', id, code });
   } catch (error) {
     console.error("REGISTER ERROR:", error);
-    res.status(500).json({ error: 'Database error while registering user.' });
+    res.status(500).json({ error: error.message || 'Database error while registering user.' });
   }
 });
 
@@ -152,7 +152,7 @@ app.post('/api/auth/login', async (req, res) => {
     res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role, is_verified: user.is_verified === 1 } });
   } catch (error) {
     console.error("LOGIN ERROR:", error);
-    res.status(500).json({ error: 'Database connection failed.' });
+    res.status(500).json({ error: error.message || 'Database connection failed.' });
   }
 });
 
@@ -163,7 +163,7 @@ app.get('/api/products', async (req, res) => {
     res.json({ rows: result.rows });
   } catch (error) {
     console.error("PRODUCTS FETCH ERROR:", error);
-    res.status(500).json({ error: 'Unable to fetch products from database.' });
+    res.status(500).json({ error: error.message || 'Unable to fetch products from database.' });
   }
 });
 
