@@ -169,7 +169,7 @@ app.post('/api/auth/login', async (req, res) => {
   const { email, password } = result.data;
   try {
     const result = await client.execute({
-      sql: QUERIES.GET_USER_SAFE,
+      sql: QUERIES.GET_USER_BY_EMAIL,
       args: [email]
     });
 
@@ -182,7 +182,12 @@ app.post('/api/auth/login', async (req, res) => {
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
     res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role, is_verified: user.is_verified === 1 } });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("LOGIN ERROR:", error);
+    res.status(500).json({ 
+       error: 'Database connection failed.', 
+       details: error.message || 'Check server logs for more info.',
+       code: error.code || 'UNKNOWN'
+    });
   }
 });
 

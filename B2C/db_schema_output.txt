@@ -1,4 +1,4 @@
-Tables found: products, active_pools, order_history, users
+Tables found: products, active_pools, order_history, users, reviews, reports, pool_distributors, distributor_reviews
 
 --- Table: products ---
 CREATE TABLE products (
@@ -13,7 +13,7 @@ CREATE TABLE products (
   timeLeft TEXT,
   image TEXT,
   category TEXT
-, supplier_id TEXT, min_qty_to_ship INTEGER DEFAULT 1, status TEXT DEFAULT 'Pending Audit')
+, supplier_id TEXT, min_qty_to_ship INTEGER DEFAULT 1, status TEXT DEFAULT 'Pending Audit', is_infinite INTEGER DEFAULT 0, image2 TEXT, image3 TEXT)
 
 --- Table: active_pools ---
 CREATE TABLE active_pools (
@@ -35,7 +35,7 @@ CREATE TABLE order_history (
   units INTEGER,
   savings TEXT,
   status TEXT
-)
+, user_id TEXT REFERENCES users(id), product_id TEXT REFERENCES products(id), city TEXT DEFAULT 'Mumbai')
 
 --- Table: users ---
 CREATE TABLE users (
@@ -44,4 +44,47 @@ CREATE TABLE users (
   email TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
   role TEXT DEFAULT 'Verified Collector'
-, is_verified INTEGER DEFAULT 0, verification_code TEXT)
+, is_verified INTEGER DEFAULT 0, verification_code TEXT, location TEXT DEFAULT 'Mumbai')
+
+--- Table: reviews ---
+CREATE TABLE reviews (
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        seller_id TEXT,
+        product_id TEXT,
+        rating INTEGER,
+        comment TEXT,
+        date TEXT
+      )
+
+--- Table: reports ---
+CREATE TABLE reports (
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        seller_id TEXT,
+        reason TEXT,
+        description TEXT,
+        date TEXT,
+        status TEXT DEFAULT 'Open'
+      )
+
+--- Table: pool_distributors ---
+CREATE TABLE pool_distributors (
+        id TEXT PRIMARY KEY,
+        product_id TEXT REFERENCES products(id),
+        distributor_id TEXT REFERENCES users(id),
+        status TEXT DEFAULT 'Pending distribution leader', 
+        last_updated TEXT
+      , city TEXT DEFAULT 'Mumbai')
+
+--- Table: distributor_reviews ---
+CREATE TABLE distributor_reviews (
+        id TEXT PRIMARY KEY,
+        distributor_id TEXT REFERENCES users(id),
+        user_id TEXT REFERENCES users(id),
+        product_id TEXT REFERENCES products(id),
+        rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+        comment TEXT,
+        date TEXT,
+        is_anonymous INTEGER DEFAULT 1
+      )

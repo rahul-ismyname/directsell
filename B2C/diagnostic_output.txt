@@ -6,9 +6,10 @@
     "date": "Mar 27, 2026",
     "units": 1,
     "savings": "-₹9,000",
-    "status": "Secured",
+    "status": "Shipped",
     "user_id": "user_1774607579611",
-    "product_id": "prod_1774607827526"
+    "product_id": "prod_1774607827526",
+    "city": "Mumbai"
   },
   {
     "id": "order_1774608893127",
@@ -16,9 +17,10 @@
     "date": "Mar 27, 2026",
     "units": 105,
     "savings": "-₹9,45,000",
-    "status": "Secured",
+    "status": "Shipped",
     "user_id": "user_1774607579611",
-    "product_id": "prod_1774607827526"
+    "product_id": "prod_1774607827526",
+    "city": "Mumbai"
   },
   {
     "id": "order_1774609047223",
@@ -26,9 +28,10 @@
     "date": "Mar 27, 2026",
     "units": 1,
     "savings": "-₹9,000",
-    "status": "Secured",
+    "status": "Shipped",
     "user_id": "user_1774607579611",
-    "product_id": "prod_1774607827526"
+    "product_id": "prod_1774607827526",
+    "city": "Mumbai"
   },
   {
     "id": "order_1774609192864",
@@ -36,9 +39,10 @@
     "date": "Mar 27, 2026",
     "units": 111,
     "savings": "-₹9,99,000",
-    "status": "Secured",
+    "status": "Shipped",
     "user_id": "user_1774607579611",
-    "product_id": "prod_1774607827526"
+    "product_id": "prod_1774607827526",
+    "city": "Mumbai"
   }
 ]
 
@@ -48,6 +52,6 @@
     "id": "prod_1774607827526",
     "title": "Laptop",
     "min_qty_to_ship": 100,
-    "progress": 8
+    "progress": 100
   }
 ]
