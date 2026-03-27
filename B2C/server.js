@@ -32,9 +32,7 @@ const REQUIRED_ENV = ['JWT_SECRET', 'VITE_TURSO_URL', 'VITE_TURSO_TOKEN'];
 const missingEnv = REQUIRED_ENV.filter(key => !process.env[key]);
 
 if (missingEnv.length > 0) {
-  console.error(`\n❌ FATAL CONFIGURATON ERROR:\nMissing required environment variables: ${missingEnv.join(', ')}`);
-  console.error("The server cannot start without these security and database credentials.\n");
-  process.exit(1);
+  throw new Error(`\n❌ FATAL CONFIGURATON ERROR:\nMissing required environment variables: ${missingEnv.join(', ')}`);
 }
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -141,7 +139,7 @@ app.post('/api/auth/register', async (req, res) => {
 
   try {
     const existing = await client.execute({
-      sql: 'SELECT * FROM users WHERE email = ?',
+      sql: QUERIES.GET_USER_SAFE,
       args: [email]
     });
 
@@ -153,7 +151,7 @@ app.post('/api/auth/register', async (req, res) => {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
     await client.execute({
-      sql: 'INSERT INTO users (id, name, email, password, role, is_verified, verification_code, location) VALUES (?, ?, ?, ?, ?, 0, ?, ?)',
+      sql: QUERIES.REGISTER_USER,
       args: [id, name, email, hashedPassword, role || 'Verified Collector', code, result.data.location || 'Mumbai']
     });
 
@@ -171,7 +169,7 @@ app.post('/api/auth/login', async (req, res) => {
   const { email, password } = result.data;
   try {
     const result = await client.execute({
-      sql: 'SELECT * FROM users WHERE email = ?',
+      sql: QUERIES.GET_USER_SAFE,
       args: [email]
     });
 
@@ -193,14 +191,14 @@ app.post('/api/auth/verify', async (req, res) => {
   const { email, code } = req.body;
   try {
     const result = await client.execute({
-      sql: 'UPDATE users SET is_verified = 1 WHERE email = ? AND verification_code = ?',
+      sql: QUERIES.VERIFY_USER_UPDATE,
       args: [email, code]
     });
     
     if (result.rowsAffected > 0) {
       // Fetch the updated user to return a token
       const userRes = await client.execute({
-        sql: 'SELECT id, name, email, role, is_verified FROM users WHERE email = ?',
+        sql: QUERIES.GET_USER_SAFE,
         args: [email]
       });
       
@@ -230,7 +228,7 @@ app.post('/api/auth/verify', async (req, res) => {
 app.get('/api/auth/me', authenticateToken, async (req, res) => {
   try {
     const result = await client.execute({
-      sql: 'SELECT id, name, email, role, is_verified FROM users WHERE id = ?',
+      sql: QUERIES.GET_USER_BY_ID,
       args: [req.user.id]
     });
     if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
@@ -245,7 +243,7 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
 // Get Products
 app.get('/api/products', async (req, res) => {
   try {
-    const result = await client.execute('SELECT * FROM products');
+    const result = await client.execute(QUERIES.GET_ALL_PRODUCTS);
     res.json({ rows: result.rows });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -261,7 +259,7 @@ app.post('/api/products', authenticateToken, async (req, res) => {
   try {
     const id = `prod_${Date.now()}`;
     await client.execute({
-      sql: 'INSERT INTO products (id, title, brand, description, price, msrp, category, supplier_id, min_qty_to_ship, image, image2, image3, progress, status, is_infinite) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      sql: QUERIES.ADD_PRODUCT,
       args: [id, title, brand, description, price, msrp, category, req.user.id, minUnits, image, image2 || null, image3 || null, 0, 'Pending Audit', isInfinite ? 1 : 0]
     });
     res.json({ success: true, id });
@@ -288,7 +286,7 @@ app.post('/api/products/:id/close-orders', authenticateToken, async (req, res) =
   const { id } = req.params;
   try {
     await client.execute({
-      sql: 'UPDATE products SET is_infinite = 0 WHERE id = ? AND supplier_id = ?',
+      sql: QUERIES.CLOSE_INFINITE_POOL,
       args: [id, req.user.id]
     });
     res.json({ success: true, message: 'Pool closed. No new orders will be accepted.' });
@@ -307,7 +305,7 @@ app.post('/api/products/:id/ship', authenticateToken, async (req, res) => {
   try {
     // 1. Double check product status and if a distributor is assigned for THIS city
     const poolRes = await client.execute({
-      sql: "SELECT * FROM pool_distributors WHERE product_id = ? AND city = ?",
+      sql: QUERIES.GET_POOL_DISTRIBUTORS_FOR_CITY,
       args: [id, city]
     });
     
@@ -317,14 +315,14 @@ app.post('/api/products/:id/ship', authenticateToken, async (req, res) => {
 
     // 2. Update product status to Shipped (for this local pool)
     await client.execute({
-      sql: "UPDATE pool_distributors SET status = 'Shipped from factory' WHERE product_id = ? AND city = ?",
-      args: [id, city]
+      sql: QUERIES.UPDATE_POOL_DISTRIBUTOR_STATUS,
+      args: ['Shipped from factory', id, city]
     });
 
     // 3. Update all associated orders for THIS City to Shipped
     await client.execute({
-      sql: "UPDATE order_history SET status = 'Shipped' WHERE product_id = ? AND city = ?",
-      args: [id, city]
+      sql: QUERIES.UPDATE_ORDER_STATUS_FOR_CITY,
+      args: ['Shipped', id, city]
     });
 
     res.json({ success: true, message: `Batch successfully shipped to the regional hub in ${city}.` });
@@ -338,10 +336,7 @@ app.get('/api/seller/regional-pools', authenticateToken, async (req, res) => {
   if (req.user.role !== 'Seller') return res.status(403).json({ error: 'Only Sellers can access this.' });
   try {
     const result = await client.execute({
-      sql: `SELECT pd.*, p.title 
-            FROM pool_distributors pd
-            JOIN products p ON pd.product_id = p.id
-            WHERE p.supplier_id = ?`,
+      sql: QUERIES.GET_SELLER_REGIONAL_POOLS,
       args: [req.user.id]
     });
     res.json({ rows: result.rows });
@@ -356,13 +351,7 @@ app.get('/api/seller/regional-pools', authenticateToken, async (req, res) => {
 app.get('/api/user/orders', authenticateToken, async (req, res) => {
   try {
     const result = await client.execute({
-      sql: `SELECT oh.*, p.supplier_id, pd.distributor_id, du.name as distributor_name 
-            FROM order_history oh
-            LEFT JOIN products p ON oh.product_id = p.id
-            LEFT JOIN pool_distributors pd ON p.id = pd.product_id
-            LEFT JOIN users du ON pd.distributor_id = du.id
-            WHERE oh.user_id = ? 
-            ORDER BY oh.date DESC`,
+      sql: QUERIES.GET_USER_ORDERS,
       args: [req.user.id]
     });
     res.json({ rows: result.rows });
@@ -382,7 +371,7 @@ app.post('/api/reviews', authenticateToken, async (req, res) => {
   
   try {
     await client.execute({
-      sql: 'INSERT INTO reviews (id, user_id, seller_id, product_id, rating, comment, date) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      sql: QUERIES.ADD_REVIEW,
       args: [id, req.user.id, sellerId, productId, rating, comment, date]
     });
     res.json({ success: true, message: 'Review submitted. Thank you for your feedback!' });
@@ -402,7 +391,7 @@ app.post('/api/reports', authenticateToken, async (req, res) => {
   
   try {
     await client.execute({
-      sql: 'INSERT INTO reports (id, user_id, seller_id, reason, description, date) VALUES (?, ?, ?, ?, ?, ?)',
+      sql: QUERIES.ADD_REPORT,
       args: [id, req.user.id, sellerId, reason, description, date]
     });
     res.json({ success: true, message: 'Report submitted. Our team will investigate. Safety first!' });
@@ -426,10 +415,7 @@ app.get('/api/distributor/pools', authenticateToken, async (req, res) => {
     const userCity = userRes.rows[0].location;
 
     const result = await client.execute({
-      sql: `SELECT pd.*, p.title, p.brand, p.image, p.status as product_status 
-            FROM pool_distributors pd
-            JOIN products p ON pd.product_id = p.id
-            WHERE pd.distributor_id = ? AND pd.city = ?`,
+      sql: QUERIES.GET_DISTRIBUTOR_POOLS,
       args: [req.user.id, userCity]
     });
     res.json({ rows: result.rows });
@@ -452,7 +438,7 @@ app.post('/api/distributor/claim-pool', authenticateToken, async (req, res) => {
 
     // Check if pool already has a distributor for this city
     const existing = await client.execute({
-      sql: 'SELECT * FROM pool_distributors WHERE product_id = ? AND city = ?',
+      sql: QUERIES.GET_POOL_DISTRIBUTORS_FOR_CITY,
       args: [productId, city]
     });
     
@@ -465,13 +451,13 @@ app.post('/api/distributor/claim-pool', authenticateToken, async (req, res) => {
       // Create a new location pool tracker
       const id = `pd_${Date.now()}`;
       await client.execute({
-        sql: 'INSERT INTO pool_distributors (id, product_id, distributor_id, status, city, last_updated) VALUES (?, ?, ?, ?, ?, ?)',
+        sql: QUERIES.ADD_POOL_DISTRIBUTOR,
         args: [id, productId, req.user.id, 'Pending distribution leader', city, now]
       });
     } else {
       // Update existing city tracker with this distributor
       await client.execute({
-        sql: 'UPDATE pool_distributors SET distributor_id = ?, last_updated = ? WHERE product_id = ? AND city = ?',
+        sql: QUERIES.CLAIM_POOL_LEADER,
         args: [req.user.id, now, productId, city]
       });
     }
@@ -489,7 +475,7 @@ app.post('/api/distributor/mark-received', authenticateToken, async (req, res) =
   try {
     const now = new Date().toISOString();
     await client.execute({
-      sql: "UPDATE pool_distributors SET status = 'Product received from supplier', last_updated = ? WHERE product_id = ? AND distributor_id = ?",
+      sql: QUERIES.UPDATE_POOL_DISTRIBUTOR_RECEIVED,
       args: [now, productId, req.user.id]
     });
     res.json({ success: true, message: 'Status updated. Note: You should notify users when ready for pickup.' });
@@ -506,13 +492,13 @@ app.post('/api/distributor/notify-users', authenticateToken, async (req, res) =>
     const now = new Date().toISOString();
     // Update status to notified
     await client.execute({
-      sql: "UPDATE pool_distributors SET status = 'Ready for Pickup - All users notified', last_updated = ? WHERE product_id = ? AND distributor_id = ?",
+      sql: QUERIES.UPDATE_POOL_DISTRIBUTOR_PICKUP,
       args: [now, productId, req.user.id]
     });
 
     // Update order status for all participants in this pool
     await client.execute({
-      sql: "UPDATE order_history SET status = 'Ready for Pickup' WHERE product_id = ?",
+      sql: QUERIES.UPDATE_ORDERS_FOR_PICKUP,
       args: [productId]
     });
 
@@ -533,10 +519,7 @@ app.get('/api/distributor/available-pools', authenticateToken, async (req, res) 
     const userCity = userRes.rows[0].location;
 
     const result = await client.execute({
-      sql: `SELECT pd.*, p.title, p.brand, p.image, p.price, p.min_qty_to_ship 
-            FROM pool_distributors pd
-            JOIN products p ON pd.product_id = p.id
-            WHERE pd.city = ? AND (pd.distributor_id IS NULL OR pd.distributor_id = '')`,
+      sql: QUERIES.GET_AVAILABLE_POOLS,
       args: [userCity]
     });
     res.json({ rows: result.rows });
@@ -568,7 +551,7 @@ app.post('/api/distributors/reviews', authenticateToken, async (req, res) => {
     const date = new Date().toLocaleDateString();
     
     await client.execute({
-      sql: 'INSERT INTO distributor_reviews (id, distributor_id, user_id, product_id, rating, comment, date, is_anonymous) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      sql: QUERIES.ADD_DISTRIBUTOR_REVIEW,
       args: [id, distributorId, req.user.id, productId, rating, comment, date, isAnonymous ? 1 : 0]
     });
     
@@ -581,11 +564,7 @@ app.post('/api/distributors/reviews', authenticateToken, async (req, res) => {
 app.get('/api/distributors/:distributorId/reviews', async (req, res) => {
    try {
     const result = await client.execute({
-      sql: `SELECT dr.rating, dr.comment, dr.date, 
-                   CASE WHEN dr.is_anonymous = 1 THEN 'Anonymous' ELSE u.name END as reviewer_name 
-            FROM distributor_reviews dr
-            LEFT JOIN users u ON dr.user_id = u.id
-            WHERE dr.distributor_id = ?`,
+      sql: QUERIES.GET_DISTRIBUTOR_REVIEWS,
       args: [req.params.distributorId]
     });
     res.json({ rows: result.rows });
@@ -623,13 +602,13 @@ app.post('/api/pools/join', authenticateToken, async (req, res) => {
     
     // 2. Insert into order history WITH city
     await client.execute({
-      sql: 'INSERT INTO order_history (id, user_id, product_id, name, date, units, savings, status, city) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      sql: QUERIES.ADD_ORDER,
       args: [id, req.user.id, productId, productName, date, quantity, savings, 'Secured', city]
     });
 
     // 3. Update or create CITY-SPECIFIC pool tracking
     const existingPool = await client.execute({
-      sql: 'SELECT * FROM pool_distributors WHERE product_id = ? AND city = ?',
+      sql: QUERIES.GET_POOL_DISTRIBUTORS_FOR_CITY,
       args: [productId, city]
     });
 
@@ -637,25 +616,14 @@ app.post('/api/pools/join', authenticateToken, async (req, res) => {
       // Start a new local pool for this city
       const pdId = `pd_${Date.now()}`;
       await client.execute({
-        sql: 'INSERT INTO pool_distributors (id, product_id, city, status, last_updated) VALUES (?, ?, ?, ?, ?)',
+        sql: QUERIES.START_NEW_LOCAL_POOL,
         args: [pdId, productId, city, 'Pending local leader', new Date().toISOString()]
       });
     }
 
     // 4. Update product's global progress (keep for display), but our core logic is increasingly local
     await client.execute({
-      sql: `UPDATE products 
-            SET progress = (
-              SELECT 
-                CASE 
-                  WHEN p.is_infinite = 1 THEN (SUM(oh.units) * 100 / p.min_qty_to_ship)
-                  ELSE MIN(100, (SUM(units) * 100 / p.min_qty_to_ship))
-                END
-              FROM order_history oh
-              JOIN products p ON oh.product_id = p.id
-              WHERE p.id = ?
-            )
-            WHERE id = ?`,
+      sql: QUERIES.UPDATE_PRODUCT_PROGRESS,
       args: [productId, productId]
     });
 
