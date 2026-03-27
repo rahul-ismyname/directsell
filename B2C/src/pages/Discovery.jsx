@@ -50,7 +50,7 @@ const ProductCard = ({ title, brand, description, progress, discount, timeLeft, 
 );
 
 const Discovery = () => {
-  const { products, searchQuery, setSearchQuery } = useAppContext();
+  const { products, searchQuery, setSearchQuery, user } = useAppContext();
   const [activeCategory, setActiveCategory] = useState('All');
 
   const categories = ['All', 'Electronics', 'Audio', 'Furniture', 'Sport', 'Energy', 'Food & Bev'];
