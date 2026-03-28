@@ -78,6 +78,21 @@ const SellerDashboard = () => {
           </button>
         </header>
 
+        {user.kyc_status !== 'Verified' && (
+          <div style={{ backgroundColor: '#fffbe6', border: '1px solid #ffe58f', borderRadius: '12px', padding: '16px 24px', marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ backgroundColor: '#faad14', color: 'white', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>!</div>
+              <div>
+                <strong style={{ display: 'block', fontSize: '16px' }}>KYC Required</strong>
+                <span style={{ fontSize: '14px', color: '#856404' }}>Verify your business identity to unlock full settlement and infinite supply features.</span>
+              </div>
+            </div>
+            <button onClick={() => navigate('/kyc')} className="btn btn-primary" style={{ backgroundColor: '#faad14', borderColor: '#faad14' }}>
+              Complete KYC
+            </button>
+          </div>
+        )}
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '64px' }}>
           {/* Active Listings */}
           <div>
@@ -232,19 +247,19 @@ const SellerDashboard = () => {
           {/* Stats Sidebar */}
           <aside>
             <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
-               <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '16px' }}>Network Verification</h4>
-               <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--system-green)' }}></div>
-                  <div style={{ fontSize: '13px', fontWeight: 500 }}>Factory Audit Passed</div>
-               </div>
+                <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '16px' }}>Network Verification</h4>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
-                   <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--system-green)' }}></div>
-                   <div style={{ fontSize: '13px', fontWeight: 500 }}>GST Verified</div>
+                   <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: user.kyc_status === 'Verified' ? 'var(--system-green)' : 'var(--system-gray)' }}></div>
+                   <div style={{ fontSize: '13px', fontWeight: 500 }}>Factory Audit Passed</div>
                 </div>
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                   <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--accent-blue)' }}></div>
-                   <div style={{ fontSize: '13px', fontWeight: 500 }}>Escrow Agreement Signed</div>
-                </div>
+                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: user.kyc_status === 'Verified' ? 'var(--system-green)' : 'var(--system-gray)' }}></div>
+                    <div style={{ fontSize: '13px', fontWeight: 500 }}>GST Verified ({user.gstin || 'Pending'})</div>
+                 </div>
+                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: user.kyc_status === 'Verified' ? 'var(--system-green)' : 'var(--accent-blue)' }}></div>
+                    <div style={{ fontSize: '13px', fontWeight: 500 }}>Settlement UPI: {user.upi_id || 'Not Set'}</div>
+                 </div>
              </div>
              
              <div className="card" style={{ padding: '24px', background: 'linear-gradient(135deg, #1d1d1f 0%, #333 100%)', color: 'white' }}>

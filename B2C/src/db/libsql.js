@@ -28,6 +28,7 @@ const api = {
     me: () => fetchWithToken('/auth/me'),
     orders: () => fetchWithToken('/user/orders'),
     verify: (data) => fetchWithToken('/auth/verify', { method: 'POST', body: JSON.stringify(data) }),
+    submitKYC: (data) => fetchWithToken('/auth/kyc', { method: 'POST', body: JSON.stringify(data) }),
   },
   products: {
     getAll: () => fetchWithToken('/products'),
@@ -54,6 +55,13 @@ const api = {
     notifyUsers: (productId) => fetchWithToken('/distributor/notify-users', { method: 'POST', body: JSON.stringify({ productId }) }),
     submitReview: (data) => fetchWithToken('/distributors/reviews', { method: 'POST', body: JSON.stringify(data) }),
     getReviews: (distributorId) => fetchWithToken(`/distributors/${distributorId}/reviews`),
+  },
+  deals: {
+    getAll: () => fetchWithToken('/deals'),
+    getOne: (id) => fetchWithToken(`/deals/${id}`),
+    create: (data) => fetchWithToken('/deals', { method: 'POST', body: JSON.stringify(data) }),
+    purchaseShare: (dealId, units) => fetchWithToken(`/deals/${dealId}/shares`, { method: 'POST', body: JSON.stringify({ units }) }),
+    getUserShares: () => fetchWithToken('/user/shares'),
   }
 };
 

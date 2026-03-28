@@ -186,7 +186,17 @@ app.post('/api/auth/login', async (req, res) => {
     if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
 
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role, is_verified: user.is_verified === 1 } });
+    res.json({ token, user: { 
+      id: user.id, 
+      name: user.name, 
+      email: user.email, 
+      role: user.role, 
+      is_verified: user.is_verified === 1,
+      kyc_status: user.kyc_status || 'Pending',
+      shop_name: user.shop_name,
+      gstin: user.gstin,
+      upi_id: user.upi_id
+    } });
   } catch (error) {
     res.status(500).json({ error: 'Database connection failed.', details: error.message });
   }
@@ -212,7 +222,14 @@ app.post('/api/auth/verify', async (req, res) => {
       res.json({ 
         success: true, 
         token, 
-        user: { id: user.id, name: user.name, email: user.email, role: user.role, is_verified: user.is_verified === 1 } 
+        user: { 
+          id: user.id, 
+          name: user.name, 
+          email: user.email, 
+          role: user.role, 
+          is_verified: user.is_verified === 1,
+          kyc_status: user.kyc_status || 'Pending'
+        } 
       });
     } else {
       res.status(400).json({ error: 'Invalid verification code' });
@@ -230,6 +247,19 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
     });
     if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
     res.json({ user: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/auth/kyc', authenticateToken, async (req, res) => {
+  const { shopName, ownerName, category, gstin, upiId } = req.body;
+  try {
+    await client.execute({
+      sql: QUERIES.UPDATE_USER_KYC,
+      args: [shopName, ownerName, category, gstin, upiId, req.user.id]
+    });
+    res.json({ success: true, message: 'KYC verified successfully.' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -582,6 +612,85 @@ app.post('/api/pools/join', authenticateToken, async (req, res) => {
     });
 
     res.json({ success: true, orderId: id, city });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- POOL ENGINE: DEALS & SHARES ---
+
+app.post('/api/deals', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'Seller' && req.user.role !== 'Supplier') return res.status(403).json({ error: 'Access denied' });
+  const { productId, totalUnits, pricePerUnit, endDate } = req.body;
+  const id = `deal_${Date.now()}`;
+  try {
+    await client.execute({
+      sql: QUERIES.CREATE_DEAL,
+      args: [id, productId, req.user.id, totalUnits, pricePerUnit, 'Open', endDate, new Date().toISOString()]
+    });
+    res.json({ success: true, id });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/deals', async (req, res) => {
+  try {
+    const result = await client.execute(QUERIES.GET_ALL_DEALS);
+    res.json({ rows: result.rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/deals/:id', async (req, res) => {
+  try {
+    const result = await client.execute({
+      sql: QUERIES.GET_DEAL_BY_ID,
+      args: [req.params.id]
+    });
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Deal not found' });
+    res.json({ deal: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/deals/:id/shares', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { units } = req.body;
+  try {
+    const dealRes = await client.execute({
+      sql: 'SELECT price_per_unit, total_units, units_pledged FROM deals WHERE id = ?',
+      args: [id]
+    });
+    if (dealRes.rows.length === 0) return res.status(404).json({ error: 'Deal not found' });
+    const deal = dealRes.rows[0];
+    if (deal.units_pledged + units > deal.total_units) {
+      return res.status(400).json({ error: 'Batch capacity exceeded.' });
+    }
+    const shareId = `share_${Date.now()}`;
+    await client.execute({
+      sql: QUERIES.PURCHASE_SHARE,
+      args: [shareId, id, req.user.id, units, deal.price_per_unit * units, 'Pending', new Date().toISOString()]
+    });
+    await client.execute({
+      sql: QUERIES.UPDATE_DEAL_PROGRESS,
+      args: [id, id]
+    });
+    res.json({ success: true, shareId });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/user/shares', authenticateToken, async (req, res) => {
+  try {
+    const result = await client.execute({
+      sql: QUERIES.GET_USER_SHARES,
+      args: [req.user.id]
+    });
+    res.json({ rows: result.rows });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

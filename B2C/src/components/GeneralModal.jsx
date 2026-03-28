@@ -43,15 +43,41 @@ const GeneralModal = () => {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           {content.sections.map((section, i) => (
-            <div key={i} className="fade-in" style={{ animationDelay: `${i*0.1}s` }}>
-              <h3 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '8px', color: 'var(--primary-blue)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{section.label}</h3>
-              <p style={{ fontSize: '14px', lineHeight: 1.6, color: 'var(--text-muted)' }}>{section.text}</p>
+            <div key={i} className="fade-in" style={{ animationDelay: `${i*0.1}s`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px' }}>
+              <div style={{ flex: 1 }}>
+                <h3 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '8px', color: 'var(--primary-blue)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{section.label}</h3>
+                <p style={{ fontSize: '14px', lineHeight: 1.6, color: 'var(--text-muted)' }}>{section.text}</p>
+              </div>
+              {activeModal === 'cookies' && (
+                <div style={{ marginTop: '4px' }}>
+                  <div style={{ 
+                    width: '40px', 
+                    height: '24px', 
+                    borderRadius: '12px', 
+                    backgroundColor: i === 0 ? 'var(--accent-blue)' : '#cbd5e1', 
+                    position: 'relative',
+                    cursor: i === 0 ? 'not-allowed' : 'pointer'
+                  }}>
+                    <div style={{ 
+                      width: '18px', 
+                      height: '18px', 
+                      borderRadius: '50%', 
+                      backgroundColor: 'white', 
+                      position: 'absolute', 
+                      top: '3px', 
+                      right: i === 0 ? '3px' : 'auto',
+                      left: i === 0 ? 'auto' : '3px',
+                      transition: 'all 0.3s ease'
+                    }}></div>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
 
         <button className="btn btn-primary" style={{ width: '100%', marginTop: '40px', padding: '16px' }} onClick={() => setActiveModal(null)}>
-          Understood
+          {activeModal === 'cookies' ? 'Save Preferences' : 'Understood'}
         </button>
       </div>
     </div>

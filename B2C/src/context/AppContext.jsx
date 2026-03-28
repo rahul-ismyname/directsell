@@ -19,6 +19,8 @@ export const AppProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [activePools, setActivePools] = useState([]);
   const [orderHistory, setOrderHistory] = useState([]);
+  const [deals, setDeals] = useState([]);
+  const [userShares, setUserShares] = useState([]);
 
   const fetchInitialData = useCallback(async () => {
     try {
@@ -29,7 +31,13 @@ export const AppProvider = ({ children }) => {
       if (token && user) {
         const orderRes = await api.auth.orders();
         if (orderRes.rows) setOrderHistory(orderRes.rows);
+
+        const shareRes = await api.deals.getUserShares();
+        if (shareRes.rows) setUserShares(shareRes.rows);
       }
+
+      const dealsRes = await api.deals.getAll();
+      if (dealsRes.rows) setDeals(dealsRes.rows);
     } catch (error) {
       console.error("Data Fetch Error:", error);
     }
@@ -85,6 +93,19 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const submitKYC = async (kycData) => {
+    try {
+      await api.auth.submitKYC(kycData);
+      const res = await api.auth.me();
+      setUser(res.user);
+      addNotification("KYC Documented Successfully!");
+      return { success: true };
+    } catch (error) {
+      addNotification("KYC submission failed", "error");
+      return { success: false, error: error.message };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('b2c_user');
@@ -111,6 +132,16 @@ export const AppProvider = ({ children }) => {
   };
 
   const joinPool = async (product, quantity) => {
+    if (!user) {
+      addNotification("Please sign in to join pools.", "error");
+      return { success: false };
+    }
+    
+    if (user.kyc_status !== 'Verified') {
+      addNotification("Please complete KYC verification to join pools.", "error");
+      return { success: false, needsKYC: true };
+    }
+
     try {
       const savingsAmount = (product.msrp - product.price) * quantity;
       
@@ -175,6 +206,15 @@ export const AppProvider = ({ children }) => {
         { label: "Direct Logistics", text: "By bypassing 3-4 middle-men, we reduce shipping legs and carbon emissions by 40%." },
         { label: "Waste Reduction", text: "Only manufacturing what is already sold prevents overproduction waste." }
       ]
+    },
+    cookies: {
+      title: "Cookie Settings",
+      subtitle: "Manage your privacy and data preferences.",
+      sections: [
+        { label: "Essential Cookies", text: "These are required for technical reasons such as maintaining your login session and processing orders. They cannot be disabled." },
+        { label: "Analytics Cookies", text: "Help us understand how the collective uses the platform to optimize supply routes and manufacturing cycles." },
+        { label: "Marketing Cookies", text: "Used to show relevant bulk-buying opportunities based on your previous interest." }
+      ]
     }
   };
 
@@ -226,6 +266,40 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const purchaseShare = async (dealId, units) => {
+    if (!user) {
+      addNotification("Please sign in to join pools.", "error");
+      return { success: false };
+    }
+
+    if (user.kyc_status !== 'Verified') {
+      addNotification("KYC verification required to participate in deals.", "error");
+      return { success: false, needsKYC: true };
+    }
+
+    try {
+      await api.deals.purchaseShare(dealId, units);
+      addNotification(`Purchased ${units} share(s) successfully!`);
+      await fetchInitialData();
+      return { success: true };
+    } catch (e) {
+      addNotification(e.message, "error");
+      return { success: false, error: e.message };
+    }
+  };
+
+  const createDeal = async (dealData) => {
+    try {
+      await api.deals.create(dealData);
+      addNotification("New manufacturing pool created!");
+      await fetchInitialData();
+      return { success: true };
+    } catch (e) {
+      addNotification(e.message, "error");
+      return { success: false, error: e.message };
+    }
+  };
+
   return (
     <AppContext.Provider value={{
       user,
@@ -233,10 +307,15 @@ export const AppProvider = ({ children }) => {
       logout,
       register,
       verifyUser,
+      submitKYC,
       products,
       activePools,
       orderHistory,
+      deals,
+      userShares,
       joinPool,
+      purchaseShare,
+      createDeal,
       searchQuery,
       setSearchQuery,
       notifications,

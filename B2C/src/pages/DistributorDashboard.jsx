@@ -64,6 +64,32 @@ const DistributorDashboard = () => {
           <p style={{ color: 'var(--text-muted)', fontSize: '18px' }}>Coordinate local distribution for your community pools in {user?.location}.</p>
         </header>
 
+        {user.kyc_status !== 'Verified' && (
+          <div className="card fade-in" style={{ 
+            padding: '24px 32px', 
+            backgroundColor: 'var(--accent-blue)', 
+            color: 'white', 
+            borderRadius: '24px', 
+            marginBottom: '40px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            boxShadow: '0 20px 40px rgba(0, 122, 255, 0.2)'
+          }}>
+            <div style={{ flex: 1 }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '4px' }}>Complete Distributor Verification</h3>
+              <p style={{ fontSize: '14px', opacity: 0.9 }}>As a distribution leader, you must verify your identity to handle cargo and manage local hubs.</p>
+            </div>
+            <button 
+              onClick={() => navigate('/kyc')}
+              className="btn" 
+              style={{ backgroundColor: 'white', color: 'var(--accent-blue)', padding: '12px 24px', fontWeight: 600, marginLeft: '24px' }}
+            >
+              Verify Identity
+            </button>
+          </div>
+        )}
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '64px' }}>
           <div>
             <section style={{ marginBottom: '48px' }}>

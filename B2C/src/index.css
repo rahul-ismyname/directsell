@@ -1,4 +1,13 @@
+@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+@theme {
+  --color-electric-blue: #2563eb;
+  --color-deep-slate: #1e293b;
+  --color-bank-bg: #ffffff;
+}
+
+
 
 :root {
   /* macOS Color Palette */

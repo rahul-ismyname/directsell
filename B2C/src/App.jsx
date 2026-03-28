@@ -14,6 +14,7 @@ import SellerRegister from './pages/SellerRegister'
 import Register from './pages/Register'
 import SellerDashboard from './pages/SellerDashboard'
 import TermsAndConditions from './pages/TermsAndConditions'
+import KYC from './pages/KYC'
 import DistributorDashboard from './pages/DistributorDashboard'
 import HowItWorksModal from './components/HowItWorksModal'
 import GeneralModal from './components/GeneralModal'
@@ -43,6 +44,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="/distributor" element={<DistributorDashboard />} />
+            <Route path="/kyc" element={<KYC />} />
           </Routes>
         </main>
         <Footer />

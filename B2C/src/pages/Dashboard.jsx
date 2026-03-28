@@ -5,7 +5,7 @@ import ProposePoolModal from '../components/ProposePoolModal';
 import ReviewActionModal from '../components/ReviewActionModal';
 
 const Dashboard = () => {
-  const { activePools, orderHistory, addNotification, user, submitReview, submitReport } = useAppContext();
+  const { activePools, orderHistory, addNotification, user, submitReview, submitReport, userShares, deals } = useAppContext();
   const [isProposeModalOpen, setIsProposeModalOpen] = useState(false);
   const [activeOrderForReview, setActiveOrderForReview] = useState(null);
   const navigate = useNavigate();
@@ -41,47 +41,80 @@ const Dashboard = () => {
             <p style={{ color: 'var(--text-muted)', fontSize: '18px' }}>Active manufacturing commitments and historical impact.</p>
           </header>
 
+          {user.kyc_status !== 'Verified' && (
+            <div className="card fade-in" style={{ 
+              padding: '24px 32px', 
+              backgroundColor: 'var(--accent-blue)', 
+              color: 'white', 
+              borderRadius: '24px', 
+              marginBottom: '40px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              boxShadow: '0 20px 40px rgba(0, 122, 255, 0.2)'
+            }}>
+              <div style={{ flex: 1 }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '4px' }}>Complete Your Account Verification</h3>
+                <p style={{ fontSize: '14px', opacity: 0.9 }}>Verify your identity to participate in manufacturing pools and secure settlements.</p>
+              </div>
+              <button 
+                onClick={() => navigate('/kyc')}
+                className="btn" 
+                style={{ backgroundColor: 'white', color: 'var(--accent-blue)', padding: '12px 24px', fontWeight: 600, marginLeft: '24px' }}
+              >
+                Verify Now
+              </button>
+            </div>
+          )}
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '64px', alignItems: 'start' }}>
             {/* Main Area */}
             <div className="main-content">
               <section style={{ marginBottom: '64px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                  <h2 style={{ fontSize: '20px', fontWeight: 600 }}>Active Commitment Pools</h2>
-                  <span style={{ fontSize: '13px', color: 'var(--accent-blue)', fontWeight: 600, cursor: 'pointer' }}>View all →</span>
+                  <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--primary-blue)' }}>Manufacturing Shares Portfolio</h2>
+                  <span style={{ fontSize: '13px', color: 'var(--accent-blue)', fontWeight: 600, cursor: 'pointer' }}>Manage Portfolio →</span>
                 </div>
                 <div className="grid-main" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))' }}>
-                  {activePools.map((pool, idx) => (
-                    <div key={idx} className="card hover-lift" style={{ padding: '24px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-                        <div style={{ padding: '8px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.03)', color: 'var(--primary-blue)' }}>
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                  {userShares.map((share, idx) => {
+                    const deal = deals.find(d => d.id === share.deal_id);
+                    const progress = deal ? Math.min(100, Math.round((deal.units_pledged / deal.total_units) * 100)) : 0;
+                    
+                    return (
+                      <div key={idx} className="card hover-lift" style={{ padding: '24px', backgroundColor: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+                          <div style={{ padding: '8px', borderRadius: '8px', backgroundColor: 'var(--accent-blue-light)', color: 'var(--accent-blue)' }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                          </div>
+                          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--accent-blue)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{progress}% FILLED</span>
                         </div>
-                        <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--system-green)', textTransform: 'uppercase' }}>{pool.progress}% CAPACITY</span>
+                        <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '4px', color: 'var(--primary-blue)' }}>{share.product_title}</h3>
+                        <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '24px', fontWeight: 500 }}>
+                          Share Holding: {share.units} Slices • ₹{share.pledged_amount.toLocaleString('en-IN')}
+                        </p>
+                        
+                        <div style={{ marginBottom: '24px' }}>
+                          <div style={{ height: '6px', backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: '3px', overflow: 'hidden', marginBottom: '12px' }}>
+                            <div style={{ height: '100%', width: `${progress}%`, backgroundColor: 'var(--accent-blue)', borderRadius: '3px', transition: 'width 1.5s ease' }}></div>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 700 }}>
+                            <span style={{ color: 'var(--text-muted)' }}>BATCH STATUS</span>
+                            <span style={{ color: 'var(--accent-blue)' }}>{deal?.status || 'Active'}</span>
+                          </div>
+                        </div>
+                        
+                        <button className="btn btn-secondary" style={{ width: '100%', fontSize: '13px', fontWeight: 600 }} onClick={() => navigate(`/product/${deal?.product_id}`)}>Track Production</button>
                       </div>
-                      <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '4px' }}>{pool.name}</h3>
-                      <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '24px' }}>Batch {pool.batch} • {pool.units ? `${pool.units} Units` : 'Locked in Oct'}</p>
-                      
-                      <div style={{ marginBottom: '24px' }}>
-                        <div style={{ height: '4px', backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: '2px', overflow: 'hidden', marginBottom: '12px' }}>
-                          <div style={{ height: '100%', width: `${pool.progress}%`, backgroundColor: 'var(--accent-blue)', borderRadius: '2px' }}></div>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 600 }}>
-                          <span style={{ color: 'var(--text-muted)' }}>MSRP {pool.msrp}</span>
-                          <span style={{ color: 'var(--system-green)' }}>SAVING {pool.saved}</span>
-                        </div>
-                      </div>
-                      
-                      <button className="btn btn-secondary" style={{ width: '100%', fontSize: '13px' }}>Track Production</button>
-                    </div>
-                  ))}
+                    );
+                  })}
                   
-                  <div className="card" style={{ padding: '24px', background: 'var(--accent-blue-light)', border: '1px dashed var(--border-light)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                      <div style={{ width: 40, height: 40, borderRadius: '50%', backgroundColor: 'var(--accent-blue)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+                  <div className="card" style={{ padding: '24px', background: 'var(--accent-blue-light)', border: '1px dashed var(--accent-blue)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', opacity: 0.8 }}>
+                      <div style={{ width: 48, height: 48, borderRadius: '50%', backgroundColor: 'var(--accent-blue)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', boxShadow: '0 8px 16px rgba(0, 122, 255, 0.2)' }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 5v14M5 12h14"/></svg>
                       </div>
-                      <h4 style={{ fontSize: '15px', fontWeight: 600, marginBottom: '4px' }}>Open New Pool</h4>
-                      <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>Request a factory-direct order.</p>
-                      <button className="btn btn-primary" style={{ padding: '6px 16px', fontSize: '12px' }} onClick={() => setIsProposeModalOpen(true)}>Propose Pool</button>
+                      <h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '6px', color: 'var(--primary-blue)' }}>New Commitment</h4>
+                      <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '20px', lineHeight: 1.4 }}>Request a specific factory-direct batch lot.</p>
+                      <button className="btn btn-primary" style={{ padding: '8px 20px', fontSize: '12px', fontWeight: 600 }} onClick={() => setIsProposeModalOpen(true)}>Propose Pool</button>
                   </div>
                 </div>
               </section>

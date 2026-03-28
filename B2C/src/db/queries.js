@@ -12,6 +12,7 @@ export const QUERIES = {
   GET_USER_CITY: `SELECT location FROM users WHERE id = ?`,
   REGISTER_USER: `INSERT INTO users (id, name, email, password, role, is_verified, verification_code, location) VALUES (?, ?, ?, ?, ?, 0, ?, ?)`,
   VERIFY_USER_UPDATE: `UPDATE users SET is_verified = 1 WHERE email = ? AND verification_code = ?`,
+  UPDATE_USER_KYC: `UPDATE users SET kyc_status = 'Verified', shop_name = ?, owner_name = ?, business_category = ?, gstin = ?, upi_id = ? WHERE id = ?`,
 
   // Products
   GET_ALL_PRODUCTS: `SELECT * FROM products`,
@@ -44,5 +45,13 @@ export const QUERIES = {
   ADD_REVIEW: `INSERT INTO reviews (id, user_id, seller_id, product_id, rating, comment, date) VALUES (?, ?, ?, ?, ?, ?, ?)`,
   ADD_REPORT: `INSERT INTO reports (id, user_id, seller_id, reason, description, date) VALUES (?, ?, ?, ?, ?, ?)`,
   ADD_DISTRIBUTOR_REVIEW: `INSERT INTO distributor_reviews (id, distributor_id, user_id, product_id, rating, comment, date, is_anonymous) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-  GET_DISTRIBUTOR_REVIEWS: `SELECT dr.rating, dr.comment, dr.date, CASE WHEN dr.is_anonymous = 1 THEN 'Anonymous' ELSE u.name END as reviewer_name FROM distributor_reviews dr LEFT JOIN users u ON dr.user_id = u.id WHERE dr.distributor_id = ?`
+  GET_DISTRIBUTOR_REVIEWS: `SELECT dr.rating, dr.comment, dr.date, CASE WHEN dr.is_anonymous = 1 THEN 'Anonymous' ELSE u.name END as reviewer_name FROM distributor_reviews dr LEFT JOIN users u ON dr.user_id = u.id WHERE dr.distributor_id = ?`,
+
+  // Pool Engine: Deals & Shares
+  CREATE_DEAL: `INSERT INTO deals (id, product_id, supplier_id, total_units, price_per_unit, status, end_date, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+  GET_ALL_DEALS: `SELECT d.*, p.title, p.image FROM deals d JOIN products p ON d.product_id = p.id WHERE d.status = 'Open'`,
+  GET_DEAL_BY_ID: `SELECT d.*, p.title, p.brand, p.description, p.image FROM deals d JOIN products p ON d.product_id = p.id WHERE d.id = ?`,
+  PURCHASE_SHARE: `INSERT INTO pool_shares (id, deal_id, user_id, units, pledged_amount, payment_status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+  UPDATE_DEAL_PROGRESS: `UPDATE deals SET units_pledged = (SELECT SUM(units) FROM pool_shares WHERE deal_id = ?) WHERE id = ?`,
+  GET_USER_SHARES: `SELECT ps.*, d.price_per_unit, p.title as product_title FROM pool_shares ps JOIN deals d ON ps.deal_id = d.id JOIN products p ON d.product_id = p.id WHERE ps.user_id = ?`
 };

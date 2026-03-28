@@ -49,7 +49,12 @@ const Footer = () => {
           <div>© 2024 The Transparent Collective. Direct from source.</div>
           <div style={{ display: 'flex', gap: '24px' }}>
             <Link to="/terms" style={{ textDecoration: 'none', color: 'inherit' }}>TERMS & CONDITIONS</Link>
-            <a href="#" style={{ textDecoration: 'none', color: 'inherit' }}>COOKIE SETTINGS</a>
+            <button 
+              onClick={() => setActiveModal('cookies')} 
+              style={{ background: 'none', border: 'none', color: 'inherit', fontSize: '12px', cursor: 'pointer', fontWeight: 500, padding: 0, textTransform: 'uppercase' }}
+            >
+              COOKIE SETTINGS
+            </button>
           </div>
         </div>
       </div>
