@@ -108,11 +108,11 @@ const KYC = () => {
   }
 
   return (
-    <div className="kyc-page fade-in" style={{ padding: '80px 0', minHeight: '100vh', backgroundColor: 'var(--bg-gray)' }}>
+    <div className="kyc-page fade-in section-padding" style={{ minHeight: '100vh', backgroundColor: 'var(--bg-gray)' }}>
       <div className="container" style={{ maxWidth: '800px' }}>
-        <header style={{ marginBottom: '64px', textAlign: 'center' }}>
-           <h1 style={{ fontSize: '36px', fontWeight: 600, marginBottom: '12px', letterSpacing: '-0.02em' }}>{roleTitle}</h1>
-           <p style={{ color: 'var(--text-muted)', fontSize: '18px' }}>{roleSubtitle}</p>
+        <header style={{ marginBottom: '40px', textAlign: 'center' }}>
+           <h1 style={{ fontWeight: 600, marginBottom: '12px', letterSpacing: '-0.02em' }}>{roleTitle}</h1>
+           <p style={{ color: 'var(--text-muted)', fontSize: '16px' }}>{roleSubtitle}</p>
         </header>
 
         {/* Simplified Progress */}
@@ -121,8 +121,8 @@ const KYC = () => {
           {[1,2,3,4].map(step => (
             <div key={step} style={{ position: 'relative', zIndex: 1, backgroundColor: 'var(--bg-gray)', padding: '0 10px', display: 'flex', flexDir: 'column', alignItems: 'center', gap: '8px' }}>
                <div style={{ 
-                 width: 40, 
-                 height: 40, 
+                 width: 32, 
+                 height: 32, 
                  borderRadius: '50%', 
                  backgroundColor: step <= activeStep ? 'var(--accent-blue)' : 'white', 
                  color: step <= activeStep ? 'white' : 'var(--text-muted)',
@@ -131,11 +131,11 @@ const KYC = () => {
                  alignItems: 'center',
                  justifyContent: 'center',
                  fontWeight: 600,
-                 fontSize: '14px'
+                 fontSize: '12px'
                }}>
-                 {step < activeStep ? <CheckCircle2 size={20} /> : step}
+                 {step < activeStep ? <CheckCircle2 size={16} /> : step}
                </div>
-               <span style={{ fontSize: '11px', fontWeight: 600, color: step === activeStep ? 'var(--accent-blue)' : 'var(--text-muted)', textTransform: 'uppercase' }}>
+               <span className="kyc-step-label" style={{ fontSize: '10px', fontWeight: 700, color: step === activeStep ? 'var(--accent-blue)' : 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                  {['Identity', 'Tax Info', 'Payment', 'Docs'][step-1]}
                </span>
             </div>
@@ -144,13 +144,13 @@ const KYC = () => {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           {/* Section 1: Business Details */}
-          <div className="card" style={{ padding: '32px' }}>
+          <div className="card card-padding">
             <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
               {isCollector ? <User size={20} color="var(--accent-blue)" /> : <Building2 size={20} color="var(--accent-blue)" />} 
               {isCollector ? 'Personal / Business Details' : 'Business Details'}
             </h2>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            <div className="responsive-grid">
                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <label style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-muted)' }}>
                     {isCollector ? 'Shop / Account Name (Optional)' : 'Legal Shop Name'}
@@ -192,7 +192,7 @@ const KYC = () => {
           </div>
 
           {/* Section 2: Tax & Identity */}
-          <div className="card" style={{ padding: '32px' }}>
+          <div className="card card-padding">
             <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <ShieldCheck size={20} color="var(--accent-blue)" /> Tax & Identity
             </h2>
@@ -237,7 +237,7 @@ const KYC = () => {
           </div>
 
           {/* Section 3: Payments */}
-           <div className="card" style={{ padding: '32px' }}>
+           <div className="card card-padding">
             <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <Wallet size={20} color="var(--accent-blue)" /> {isCollector ? 'Payment Info' : 'Settlement Info'}
             </h2>

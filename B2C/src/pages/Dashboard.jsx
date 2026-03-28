@@ -34,9 +34,9 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="dashboard-page fade-in" style={{ padding: '80px 0' }}>
+      <div className="dashboard-page fade-in section-padding">
         <div className="container">
-          <header style={{ marginBottom: '48px' }}>
+          <header style={{ marginBottom: '32px' }}>
             <h1 style={{ fontSize: '42px', fontWeight: 600, color: 'var(--primary-blue)', letterSpacing: '-0.02em', marginBottom: '8px' }}>Portfolio Overview</h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '18px' }}>Active manufacturing commitments and historical impact.</p>
           </header>
@@ -67,15 +67,15 @@ const Dashboard = () => {
             </div>
           )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '64px', alignItems: 'start' }}>
+          <div className="responsive-dash-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '48px', alignItems: 'start' }}>
             {/* Main Area */}
             <div className="main-content">
               <section style={{ marginBottom: '64px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                   <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--primary-blue)' }}>Manufacturing Shares Portfolio</h2>
-                  <span style={{ fontSize: '13px', color: 'var(--accent-blue)', fontWeight: 600, cursor: 'pointer' }}>Manage Portfolio →</span>
+                  <span style={{ fontSize: '12px', color: 'var(--accent-blue)', fontWeight: 600, cursor: 'pointer' }}>Manage →</span>
                 </div>
-                <div className="grid-main" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))' }}>
+                <div className="grid-main" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
                   {userShares.map((share, idx) => {
                     const deal = deals.find(d => d.id === share.deal_id);
                     const progress = deal ? Math.min(100, Math.round((deal.units_pledged / deal.total_units) * 100)) : 0;
@@ -119,9 +119,9 @@ const Dashboard = () => {
                 </div>
               </section>
 
-              <section>
+               <section>
                 <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '24px' }}>History & Settlement</h2>
-                <div className="card" style={{ overflow: 'hidden' }}>
+                <div className="card mobile-scroll-x" style={{ overflow: 'hidden' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead style={{ backgroundColor: 'rgba(0,0,0,0.02)', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
                       <tr>

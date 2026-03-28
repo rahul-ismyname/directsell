@@ -199,9 +199,9 @@ const ProductDetail = () => {
 
   return (
     <>
-      <div className="product-detail-page fade-in" style={{ padding: '80px 0', backgroundColor: 'var(--bg-gray)', minHeight: '100vh' }}>
+      <div className="product-detail-page fade-in section-padding" style={{ backgroundColor: 'var(--bg-gray)', minHeight: '100vh' }}>
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '80px', alignItems: 'start' }}>
+          <div className="responsive-dash-layout" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '48px', alignItems: 'start' }}>
             
             {/* Gallery */}
             <div>
@@ -243,12 +243,12 @@ const ProductDetail = () => {
                   {product.description}
                 </p>
                 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                   <div className="card" style={{ padding: '24px', borderRadius: '20px', backgroundColor: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <div className="responsive-grid">
+                   <div className="card card-padding" style={{ borderRadius: '20px', backgroundColor: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
                      <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px', letterSpacing: '0.05em' }}>Material Grade</div>
                      <div style={{ fontSize: '16px', fontWeight: 600 }}>Industrial-T1 Standard</div>
                    </div>
-                   <div className="card" style={{ padding: '24px', borderRadius: '20px', backgroundColor: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
+                   <div className="card card-padding" style={{ borderRadius: '20px', backgroundColor: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
                      <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px', letterSpacing: '0.05em' }}>Source Origin</div>
                      <div style={{ fontSize: '16px', fontWeight: 600 }}>{product.location || 'Direct from Manufacturer'}</div>
                    </div>

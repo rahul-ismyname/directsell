@@ -11,20 +11,20 @@ const ActivePools = () => {
   );
 
   return (
-    <div className="active-pools-page fade-in" style={{ padding: '80px 0', backgroundColor: 'var(--bg-gray)', minHeight: '100vh' }}>
+    <div className="active-pools-page fade-in section-padding" style={{ backgroundColor: 'var(--bg-gray)', minHeight: '100vh' }}>
       <div className="container">
-        <header style={{ marginBottom: '64px', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '48px', fontWeight: 600, color: 'var(--primary-blue)', letterSpacing: '-0.02em', marginBottom: '16px' }}>Manufacturing Status</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '20px', maxWidth: '600px', margin: '0 auto' }}>Live tracking of all ongoing community-backed manufacturing deals.</p>
+        <header style={{ marginBottom: '40px', textAlign: 'center' }}>
+          <h1 style={{ fontWeight: 600, color: 'var(--primary-blue)', letterSpacing: '-0.02em', marginBottom: '16px' }}>Manufacturing Status</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '18px', maxWidth: '600px', margin: '0 auto' }}>Live tracking of all ongoing community-backed manufacturing deals.</p>
         </header>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '32px' }}>
+        <div className="grid-main">
           {filteredDeals.length > 0 ? filteredDeals.map((deal) => {
             const progress = Math.min(100, Math.round((deal.units_pledged / deal.total_units) * 100));
             return (
-              <div key={deal.id} className="card hover-lift" style={{ padding: '32px', backgroundColor: 'white' }}>
-                <div style={{ display: 'flex', gap: '24px', marginBottom: '32px' }}>
-                  <div style={{ width: 120, height: 120, borderRadius: '24px', overflow: 'hidden', flexShrink: 0, border: '1px solid rgba(0,0,0,0.05)' }}>
+              <div key={deal.id} className="card hover-lift card-padding" style={{ backgroundColor: 'white' }}>
+                <div className="responsive-grid" style={{ marginBottom: '24px' }}>
+                  <div style={{ width: '100%', aspectRatio: '1/1', borderRadius: '20px', overflow: 'hidden', flexShrink: 0, border: '1px solid rgba(0,0,0,0.05)' }}>
                     <img src={deal.image} alt={deal.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -47,7 +47,7 @@ const ActivePools = () => {
                    </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', padding: '24px', backgroundColor: 'rgba(0,0,0,0.02)', borderRadius: '16px', marginBottom: '32px' }}>
+                <div className="responsive-grid" style={{ padding: '20px', backgroundColor: 'rgba(0,0,0,0.02)', borderRadius: '16px', marginBottom: '32px' }}>
                    <div>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '6px' }}>Price per Share</div>
                       <div style={{ fontSize: '20px', fontWeight: 600 }}>₹{deal.price_per_unit.toLocaleString('en-IN')}</div>
