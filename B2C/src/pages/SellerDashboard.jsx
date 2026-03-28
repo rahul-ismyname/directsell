@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
+import { useProduct } from '../context/ProductContext';
+import { useUI } from '../context/UIContext';
 
 const SellerDashboard = () => {
-  const { products, addNotification, user, addProduct, verifyProduct, closePool, shipProduct, getRegionalPools } = useAppContext();
+  const { user } = useAuth();
+  const { products, addProduct, verifyProduct, closePool, shipProduct, getRegionalPools } = useProduct();
+  const { addNotification } = useUI();
   const [isListingModalOpen, setIsListingModalOpen] = useState(false);
   const [regionalPools, setRegionalPools] = useState([]);
   const navigate = useNavigate();

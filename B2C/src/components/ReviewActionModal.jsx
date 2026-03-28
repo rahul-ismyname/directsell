@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useAppContext } from '../context/AppContext';
+import { useProduct } from '../context/ProductContext';
 
 const ReviewActionModal = ({ isOpen, onClose, order }) => {
-  const { submitReview, submitReport, distributor } = useAppContext();
+  const { submitReview, submitReport, distributor } = useProduct();
   const [tab, setTab] = useState('rate'); // 'rate', 'report', 'distributor'
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');

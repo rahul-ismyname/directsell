@@ -1,8 +1,8 @@
 import React from 'react';
-import { useAppContext } from '../context/AppContext';
+import { useUI } from '../context/UIContext';
 
 const GeneralModal = () => {
-  const { activeModal, setActiveModal, modalContent } = useAppContext();
+  const { activeModal, setActiveModal, modalContent } = useUI();
 
   if (!activeModal) return null;
 

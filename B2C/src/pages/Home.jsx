@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useUI } from '../context/UIContext';
 
 const Home = () => {
-  const { isHowItWorksOpen, setIsHowItWorksOpen } = useAppContext();
+  const { isHowItWorksOpen, setIsHowItWorksOpen } = useUI();
 
   return (
     <>

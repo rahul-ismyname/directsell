@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
+import { useUI } from '../context/UIContext';
 
 
 const Footer = () => {
-  const { user, setIsHowItWorksOpen, setActiveModal } = useAppContext();
+  const { user } = useAuth();
+  const { setIsHowItWorksOpen, setActiveModal } = useUI();
   
   return (
     <footer style={{ padding: '80px 0 40px', borderTop: '1px solid rgba(0,0,0,0.05)', backgroundColor: 'var(--white)' }}>

@@ -1,9 +1,11 @@
 import React from 'react';
-import { useAppContext } from '../context/AppContext';
+import { useProduct } from '../context/ProductContext';
+import { useUI } from '../context/UIContext';
 import { Link } from 'react-router-dom';
 
 const ActivePools = () => {
-  const { deals, searchQuery } = useAppContext();
+  const { deals } = useProduct();
+  const { searchQuery } = useUI();
 
   const filteredDeals = deals.filter(d => 
     d.title.toLowerCase().includes(searchQuery.toLowerCase()) || 

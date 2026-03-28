@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
+import { useProduct } from '../context/ProductContext';
+import { useUI } from '../context/UIContext';
 
 const DistributorDashboard = () => {
-  const { products, user, distributor, addNotification } = useAppContext();
+  const { user } = useAuth();
+  const { products, distributor } = useProduct();
+  const { addNotification } = useUI();
   const [myPools, setMyPools] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
+import { useUI } from '../context/UIContext';
 import emailjs from '@emailjs/browser';
 
 const SellerRegister = () => {
@@ -12,7 +13,8 @@ const SellerRegister = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
   
-  const { register, verifyUser, login, addNotification } = useAppContext();
+  const { register, verifyUser, login } = useAuth();
+  const { addNotification } = useUI();
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {

@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
+import { useProduct } from '../context/ProductContext';
+import { useUI } from '../context/UIContext';
 import ProposePoolModal from '../components/ProposePoolModal';
 import ReviewActionModal from '../components/ReviewActionModal';
 
 const Dashboard = () => {
-  const { activePools, orderHistory, addNotification, user, submitReview, submitReport, userShares, deals } = useAppContext();
+  const { user } = useAuth();
+  const { orderHistory, userShares, deals } = useProduct();
+  const { addNotification } = useUI();
   const [isProposeModalOpen, setIsProposeModalOpen] = useState(false);
   const [activeOrderForReview, setActiveOrderForReview] = useState(null);
   const navigate = useNavigate();

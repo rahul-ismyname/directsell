@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -10,7 +10,7 @@ const Register = () => {
   const [location, setLocation] = useState('Mumbai');
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState('');
-  const { register } = useAppContext();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {

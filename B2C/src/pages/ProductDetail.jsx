@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useProduct } from '../context/ProductContext';
+import { useAuth } from '../context/AuthContext';
+import { useUI } from '../context/UIContext';
 
 const CheckoutModal = ({ isOpen, onClose, product, quantity, poolPrice, retailPrice, onConfirm }) => {
   const [step, setStep] = useState(1);
@@ -155,7 +157,9 @@ const CheckoutModal = ({ isOpen, onClose, product, quantity, poolPrice, retailPr
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { products, deals, purchaseShare } = useAppContext();
+  const { products, deals, purchaseShare } = useProduct();
+  const { user } = useAuth();
+  const { addNotification } = useUI();
   const [quantity, setQuantity] = useState(1);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(null);

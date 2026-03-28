@@ -1,8 +1,8 @@
 import React from 'react';
-import { useAppContext } from '../context/AppContext';
+import { useUI } from '../context/UIContext';
 
 const Notifications = () => {
-  const { notifications } = useAppContext();
+  const { notifications } = useUI();
 
   return (
     <div style={{

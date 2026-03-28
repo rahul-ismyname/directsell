@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
+import { useUI } from '../context/UIContext';
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { searchQuery, setSearchQuery, user, logout } = useAppContext();
+  const { user, logout } = useAuth();
+  const { searchQuery, setSearchQuery } = useUI();
   const [searchFocused, setSearchFocused] = useState(false);
   
   const navLinks = [
@@ -120,9 +122,6 @@ const Navbar = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-main)', display: 'flex', opacity: 0.8 }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 8a6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-            </button>
 
             {user ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

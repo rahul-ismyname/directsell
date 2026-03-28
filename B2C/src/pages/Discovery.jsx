@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useProduct } from '../context/ProductContext';
+import { useUI } from '../context/UIContext';
+import { useAuth } from '../context/AuthContext';
 
 const ProductCard = ({ title, brand, description, progress, discount, timeLeft, image, id, category, price, msrp, min_qty_to_ship }) => {
-  const { deals } = useAppContext();
+  const { deals } = useProduct();
   const deal = deals.find(d => d.product_id === id && d.status === 'Open');
   const currentProgress = deal ? Math.min(100, Math.round((deal.units_pledged / deal.total_units) * 100)) : progress;
 
@@ -68,7 +70,9 @@ const ProductCard = ({ title, brand, description, progress, discount, timeLeft, 
 };
 
 const Discovery = () => {
-  const { products, searchQuery, setSearchQuery, user } = useAppContext();
+  const { products } = useProduct();
+  const { searchQuery, setSearchQuery } = useUI();
+  const { user } = useAuth();
   const [activeCategory, setActiveCategory] = useState('All');
 
   const categories = ['All', 'Electronics', 'Audio', 'Furniture', 'Sport', 'Energy', 'Food & Bev'];

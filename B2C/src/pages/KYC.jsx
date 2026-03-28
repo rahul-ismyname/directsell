@@ -14,7 +14,7 @@ import {
   Wallet
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 
 const KYC = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +33,7 @@ const KYC = () => {
   const [activeStep, setActiveStep] = useState(1);
 
   const categories = ['Grocery', 'Electronics', 'Pharma', 'Fashion', 'Automotive', 'Other'];
-  const { submitKYC, user } = useAppContext();
+  const { submitKYC, user } = useAuth();
   const navigate = useNavigate();
 
   const isCollector = user?.role === 'Verified Collector';

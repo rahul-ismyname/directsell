@@ -19,10 +19,10 @@ import DistributorDashboard from './pages/DistributorDashboard'
 import HowItWorksModal from './components/HowItWorksModal'
 import GeneralModal from './components/GeneralModal'
 import './index.css'
-import { useAppContext } from './context/AppContext'
+import { useUI } from './context/UIContext'
 
 function App() {
-  const { isHowItWorksOpen, setIsHowItWorksOpen } = useAppContext();
+  const { isHowItWorksOpen, setIsHowItWorksOpen } = useUI();
   
   return (
     <Router>
